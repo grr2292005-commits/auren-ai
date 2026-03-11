@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/sections/navbar";
 import { Hero } from "@/components/sections/hero";
 import { Features } from "@/components/sections/features";
+import { ResourceEstimator } from "@/components/sections/resource-estimator";
 import { PromptPlayground } from "@/components/sections/prompt-playground";
 import { CTA } from "@/components/sections/cta";
 import { Footer } from "@/components/sections/footer";
@@ -76,6 +77,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <ResourceEstimator />
 
       <PromptPlayground />
       <CTA />
