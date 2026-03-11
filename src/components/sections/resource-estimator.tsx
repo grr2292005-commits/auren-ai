@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Brain, Zap, Link } from "lucide-react";
-import { motion } from "framer-motion";
+import { Brain, Zap, Link, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const PRIORITIES = [
@@ -105,30 +105,44 @@ export function ResourceEstimator() {
                             </div>
                         </div>
 
-                        {/* Hidden fields by default */}
-                        {selectedPriority && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="pt-12 border-t border-white/5"
-                            >
-                                {/* 
-                  The prompt says "All other form fields must be hidden by default."
-                  Since no other fields are specified, I'll just leave this placeholder 
-                  or follow the instruction to keep them "hidden" (not rendered for now).
-                */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 opacity-50 pointer-events-none">
-                                    <div className="space-y-4">
-                                        <div className="h-4 w-24 bg-white/10 rounded" />
-                                        <div className="h-10 w-full bg-white/5 border border-white/10 rounded-lg" />
+                        <AnimatePresence mode="wait">
+                            {selectedPriority && (
+                                <motion.div
+                                    key="form-fields"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.5, ease: "easeOut" }}
+                                    className="pt-12 border-t border-white/5"
+                                >
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="space-y-4">
+                                            <label className="text-sm font-medium text-gray-500 uppercase tracking-widest block">
+                                                Primary Model
+                                            </label>
+                                            <div className="relative group">
+                                                <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white appearance-none focus:outline-none focus:border-amber-500/50 transition-colors cursor-pointer group-hover:border-white/20">
+                                                    <option className="bg-neutral-900" value="standard">Auren-1-Standard</option>
+                                                    <option className="bg-neutral-900" value="reasoning">Auren-1-Reasoning</option>
+                                                </select>
+                                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <label className="text-sm font-medium text-gray-500 uppercase tracking-widest block">
+                                                Project Identifier
+                                            </label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. quantum-neural-v2"
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-amber-500/50 transition-all group-hover:border-white/20"
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="space-y-4">
-                                        <div className="h-4 w-24 bg-white/10 rounded" />
-                                        <div className="h-10 w-full bg-white/5 border border-white/10 rounded-lg" />
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
             </div>
