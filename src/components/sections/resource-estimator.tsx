@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Brain, Zap, Link, ChevronDown, Check, Sparkles } from "lucide-react";
+import { Brain, Zap, Link, ChevronDown, Check, Sparkles, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -30,13 +30,18 @@ export function ResourceEstimator() {
     const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
     const [primaryModel, setPrimaryModel] = useState<string>("standard");
     const [projectIdentifier, setProjectIdentifier] = useState<string>("");
+
+    // Step Control
+    const [showFinalStep, setShowFinalStep] = useState(false);
+
+    // Final Step State
     const [tokenVolume, setTokenVolume] = useState<string>("");
     const [unit, setUnit] = useState<"Tokens" | "Requests">("Tokens");
     const [accountType, setAccountType] = useState<"Individual" | "Organization">("Individual");
     const [enableReasoning, setEnableReasoning] = useState(false);
     const [highPriority, setHighPriority] = useState(false);
 
-    const isFirstStepComplete = selectedPriority !== null && projectIdentifier.trim().length > 0;
+    const canProceedToFinal = selectedPriority !== null && projectIdentifier.trim().length >= 3;
 
     return (
         <section className="py-24 border-t border-white/5 relative overflow-hidden transition-colors duration-500">
@@ -84,7 +89,11 @@ export function ResourceEstimator() {
                                     return (
                                         <button
                                             key={priority.id}
-                                            onClick={() => setSelectedPriority(priority.id)}
+                                            onClick={() => {
+                                                setSelectedPriority(priority.id);
+                                                // Reset lower steps if changing priority
+                                                setShowFinalStep(false);
+                                            }}
                                             className={cn(
                                                 "relative flex flex-col items-start p-6 text-left transition-all duration-300 rounded-xl border group outline-none",
                                                 isSelected
@@ -140,9 +149,28 @@ export function ResourceEstimator() {
                                     transition={{ duration: 0.5, ease: "easeOut" }}
                                     className="pt-12 border-t border-white/5 space-y-8"
                                 >
-                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-[0.2em] block">
-                                        02. Core Identity
-                                    </label>
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-[0.2em] block">
+                                            02. Core Identity
+                                        </label>
+
+                                        {/* Progressive Disclosure Button */}
+                                        <AnimatePresence>
+                                            {canProceedToFinal && !showFinalStep && (
+                                                <motion.button
+                                                    initial={{ opacity: 0, x: 20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    exit={{ opacity: 0, x: 20 }}
+                                                    onClick={() => setShowFinalStep(true)}
+                                                    className="flex items-center gap-2 text-xs font-bold text-amber-500 uppercase tracking-widest hover:text-amber-400 transition-colors group"
+                                                >
+                                                    Continue to Estimation
+                                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                                </motion.button>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                                         <div className="space-y-4">
                                             <label className="text-xs font-bold text-gray-400 block uppercase tracking-wider">
@@ -180,13 +208,13 @@ export function ResourceEstimator() {
 
                         {/* 03. Usage & Final Block */}
                         <AnimatePresence>
-                            {isFirstStepComplete && (
+                            {showFinalStep && (
                                 <motion.div
                                     key="usage-section"
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+                                    transition={{ duration: 0.5, ease: "easeOut" }}
                                     className="pt-12 border-t border-white/5 space-y-12"
                                 >
                                     <div>
