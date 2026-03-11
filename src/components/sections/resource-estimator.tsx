@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Brain, Zap, Link, ChevronDown, Check, Sparkles, ChevronRight } from "lucide-react";
+import { Brain, Zap, Link, ChevronDown, Check, Sparkles, ChevronRight, X, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -46,9 +46,6 @@ export function ResourceEstimator() {
     const [field1, setField1] = useState("");
     const [field2, setField2] = useState("");
 
-    // Step Control
-    const [showFinalStep, setShowFinalStep] = useState(false);
-
     // Final Step State
     const [tokenVolume, setTokenVolume] = useState<string>("");
     const [unit, setUnit] = useState<"Tokens" | "Requests">("Tokens");
@@ -56,17 +53,40 @@ export function ResourceEstimator() {
     const [enableReasoning, setEnableReasoning] = useState(false);
     const [highPriority, setHighPriority] = useState(false);
 
+    // Result State
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [showResult, setShowResult] = useState(false);
+    const [estimate, setEstimate] = useState<{ cost: string; compute: string; latency: string } | null>(null);
+
     // Reset when switching priority
     useEffect(() => {
         if (selectedPriority) {
-            const defaults = DYNAMIC_FIELDS[selectedPriority as keyof typeof DYNAMIC_FIELDS];
-            setField1(defaults.field1.options[0]);
-            setField2(defaults.field2.options[0]);
-            setShowFinalStep(false);
+            setField1("");
+            setField2("");
+            setShowResult(false);
         }
     }, [selectedPriority]);
 
-    const canProceedToFinal = selectedPriority !== null && field1 !== "" && field2 !== "";
+    const isReadyForFinal = selectedPriority !== null && field1 !== "" && field2 !== "";
+
+    const handleGenerateEstimate = () => {
+        setIsGenerating(true);
+
+        // Mock calculation logic
+        setTimeout(() => {
+            const baseMultiplier = selectedPriority === 'reasoning' ? 1.5 : selectedPriority === 'cloud' ? 1.2 : 1.0;
+            const vol = parseInt(tokenVolume.replace(/,/g, '')) || 1000000;
+            const costVal = (vol / 1000000) * 0.5 * baseMultiplier * (enableReasoning ? 2 : 1) * (highPriority ? 1.3 : 1);
+
+            setEstimate({
+                cost: `$${costVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                compute: highPriority ? "H100 Dedicated" : "A100 Shared",
+                latency: highPriority ? "< 85ms" : "~240ms"
+            });
+            setIsGenerating(false);
+            setShowResult(true);
+        }, 1500);
+    };
 
     return (
         <section className="py-24 border-t border-white/5 relative overflow-hidden transition-colors duration-500">
@@ -174,21 +194,6 @@ export function ResourceEstimator() {
                                         <label className="text-xs font-semibold text-gray-500 uppercase tracking-[0.2em] block">
                                             02. Intelligence Context
                                         </label>
-
-                                        <AnimatePresence>
-                                            {canProceedToFinal && !showFinalStep && (
-                                                <motion.button
-                                                    initial={{ opacity: 0, x: 20 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    exit={{ opacity: 0, x: 20 }}
-                                                    onClick={() => setShowFinalStep(true)}
-                                                    className="flex items-center gap-2 text-xs font-bold text-amber-500 uppercase tracking-widest hover:text-amber-400 transition-colors group"
-                                                >
-                                                    Continue to Estimation
-                                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                                </motion.button>
-                                            )}
-                                        </AnimatePresence>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
@@ -200,10 +205,15 @@ export function ResourceEstimator() {
                                                 <select
                                                     value={field1}
                                                     onChange={(e) => setField1(e.target.value)}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white appearance-none focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all cursor-pointer group-hover:border-white/20"
+                                                    className={cn(
+                                                        "w-full bg-white/5 border rounded-xl px-4 py-4 text-white appearance-none focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all cursor-pointer group-hover:border-white/20",
+                                                        field1 === "" ? "text-gray-500" : "text-white",
+                                                        field1 !== "" ? "border-amber-500/30" : "border-white/10"
+                                                    )}
                                                 >
+                                                    <option value="" disabled className="bg-neutral-900">Select Here</option>
                                                     {DYNAMIC_FIELDS[selectedPriority as keyof typeof DYNAMIC_FIELDS].field1.options.map(opt => (
-                                                        <option key={opt} className="bg-neutral-900" value={opt}>{opt}</option>
+                                                        <option key={opt} className="bg-neutral-900 text-white" value={opt}>{opt}</option>
                                                     ))}
                                                 </select>
                                                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none group-hover:text-gray-300 transition-colors" />
@@ -218,10 +228,15 @@ export function ResourceEstimator() {
                                                 <select
                                                     value={field2}
                                                     onChange={(e) => setField2(e.target.value)}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white appearance-none focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all cursor-pointer group-hover:border-white/20"
+                                                    className={cn(
+                                                        "w-full bg-white/5 border rounded-xl px-4 py-4 text-white appearance-none focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all cursor-pointer group-hover:border-white/20",
+                                                        field2 === "" ? "text-gray-500" : "text-white",
+                                                        field2 !== "" ? "border-amber-500/30" : "border-white/10"
+                                                    )}
                                                 >
+                                                    <option value="" disabled className="bg-neutral-900">Select Here</option>
                                                     {DYNAMIC_FIELDS[selectedPriority as keyof typeof DYNAMIC_FIELDS].field2.options.map(opt => (
-                                                        <option key={opt} className="bg-neutral-900" value={opt}>{opt}</option>
+                                                        <option key={opt} className="bg-neutral-900 text-white" value={opt}>{opt}</option>
                                                     ))}
                                                 </select>
                                                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none group-hover:text-gray-300 transition-colors" />
@@ -234,7 +249,7 @@ export function ResourceEstimator() {
 
                         {/* 03. Usage & Final Block */}
                         <AnimatePresence>
-                            {showFinalStep && (
+                            {isReadyForFinal && (
                                 <motion.div
                                     key="usage-section"
                                     initial={{ opacity: 0, y: 20 }}
@@ -254,9 +269,12 @@ export function ResourceEstimator() {
                                                 </label>
                                                 <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-hidden group focus-within:ring-1 focus-within:ring-amber-500/50 focus-within:border-amber-500/50 transition-all">
                                                     <input
-                                                        type="number"
+                                                        type="text"
                                                         value={tokenVolume}
-                                                        onChange={(e) => setTokenVolume(e.target.value)}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value.replace(/\D/g, "");
+                                                            setTokenVolume(val.replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                                                        }}
                                                         placeholder="5,000,000"
                                                         className="flex-1 bg-transparent px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none"
                                                     />
@@ -344,13 +362,85 @@ export function ResourceEstimator() {
 
                                     {/* Estimate CTA */}
                                     <div className="pt-8 text-center">
-                                        <button className="relative group px-12 py-5 rounded-full bg-amber-500 text-black font-extrabold text-lg transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_30px_rgba(245,158,11,0.2)] hover:shadow-[0_0_50px_rgba(245,158,11,0.4)]">
+                                        <button
+                                            onClick={handleGenerateEstimate}
+                                            disabled={isGenerating}
+                                            className={cn(
+                                                "relative group px-12 py-5 rounded-full bg-amber-500 text-black font-extrabold text-lg transition-all active:scale-[0.98] shadow-[0_0_30px_rgba(245,158,11,0.2)] hover:shadow-[0_0_50px_rgba(245,158,11,0.4)] overflow-hidden",
+                                                isGenerating ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02]"
+                                            )}
+                                        >
                                             <span className="relative z-10 flex items-center justify-center gap-2">
-                                                Generate Estimate
-                                                <Sparkles className="w-5 h-5 animate-pulse" />
+                                                {isGenerating ? "Analyzing Workload..." : "Generate Estimate"}
+                                                <Sparkles className={cn("w-5 h-5", isGenerating ? "animate-spin" : "animate-pulse")} />
                                             </span>
+                                            {isGenerating && (
+                                                <motion.div
+                                                    initial={{ x: "-100%" }}
+                                                    animate={{ x: "100%" }}
+                                                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                                                />
+                                            )}
                                             <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
                                         </button>
+
+                                        {/* Result Display */}
+                                        <AnimatePresence>
+                                            {showResult && estimate && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                    className="mt-12 p-1 bg-gradient-to-br from-amber-500/20 via-white/5 to-transparent rounded-3xl"
+                                                >
+                                                    <div className="bg-neutral-950 rounded-[22px] p-8 md:p-10 relative overflow-hidden">
+                                                        {/* Close button for result */}
+                                                        <button
+                                                            onClick={() => setShowResult(false)}
+                                                            className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
+                                                        >
+                                                            <X className="w-5 h-5" />
+                                                        </button>
+
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                                                            <div className="text-left space-y-2">
+                                                                <span className="text-xs font-bold text-amber-500/60 uppercase tracking-widest">Estimated Monthly</span>
+                                                                <div className="text-4xl md:text-5xl font-black text-white tracking-tight">
+                                                                    {estimate.cost}
+                                                                </div>
+                                                                <p className="text-sm text-gray-500 italic">*Based on current compute spot rates</p>
+                                                            </div>
+
+                                                            <div className="flex flex-col gap-4 border-y md:border-y-0 md:border-x border-white/10 py-6 md:py-0 md:px-8">
+                                                                <div className="flex items-center justify-between text-sm">
+                                                                    <span className="text-gray-400">Compute Tier</span>
+                                                                    <span className="text-white font-mono">{estimate.compute}</span>
+                                                                </div>
+                                                                <div className="flex items-center justify-between text-sm">
+                                                                    <span className="text-gray-400">P99 Latency</span>
+                                                                    <span className="text-amber-500 font-mono">{estimate.latency}</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex flex-col gap-3">
+                                                                <button className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors">
+                                                                    Start Free Trial
+                                                                </button>
+                                                                <button className="w-full py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-colors">
+                                                                    Contact Sales
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="mt-8 flex items-center gap-2 text-[10px] text-gray-600 justify-center">
+                                                            <Info className="w-3 h-3" />
+                                                            Estimates are calculated using Auren Dynamic Pricing Engine v4.2
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+
                                         <div className="mt-6 flex items-center justify-center gap-6 opacity-40 grayscale pointer-events-none">
                                             <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Scalable</span>
                                             <div className="w-1 h-1 rounded-full bg-white/50" />
