@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Brain, Zap, Link, ChevronDown, Check, Sparkles, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -26,10 +26,25 @@ const PRIORITIES = [
     },
 ];
 
+const DYNAMIC_FIELDS = {
+    reasoning: {
+        field1: { label: "Inference Strategy", options: ["Auren-Logic-Standard", "Auren-Logic-Pro", "Auren-Deep-Chain"] },
+        field2: { label: "Context Capacity", options: ["128K Window", "512K Window", "1M+ Infinite"] }
+    },
+    velocity: {
+        field1: { label: "Ship Protocol", options: ["Automated CI/CD", "Blue/Green Strategy", "Canary Deployment"] },
+        field2: { label: "SDK Layer", options: ["TypeScript Native", "Pythonic Interface", "Rust/Wasm Core"] }
+    },
+    cloud: {
+        field1: { label: "Cloud Node", options: ["AWS US-East", "Azure Europe-West", "GCP Asia-Tokyo", "On-Prem-Bridge"] },
+        field2: { label: "Connection Bridge", options: ["Direct VPC Tunnel", "mTLS Secure Link", "Standard API"] }
+    }
+};
+
 export function ResourceEstimator() {
     const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
-    const [primaryModel, setPrimaryModel] = useState<string>("standard");
-    const [projectIdentifier, setProjectIdentifier] = useState<string>("");
+    const [field1, setField1] = useState("");
+    const [field2, setField2] = useState("");
 
     // Step Control
     const [showFinalStep, setShowFinalStep] = useState(false);
@@ -41,7 +56,17 @@ export function ResourceEstimator() {
     const [enableReasoning, setEnableReasoning] = useState(false);
     const [highPriority, setHighPriority] = useState(false);
 
-    const canProceedToFinal = selectedPriority !== null && projectIdentifier.trim().length >= 3;
+    // Reset when switching priority
+    useEffect(() => {
+        if (selectedPriority) {
+            const defaults = DYNAMIC_FIELDS[selectedPriority as keyof typeof DYNAMIC_FIELDS];
+            setField1(defaults.field1.options[0]);
+            setField2(defaults.field2.options[0]);
+            setShowFinalStep(false);
+        }
+    }, [selectedPriority]);
+
+    const canProceedToFinal = selectedPriority !== null && field1 !== "" && field2 !== "";
 
     return (
         <section className="py-24 border-t border-white/5 relative overflow-hidden transition-colors duration-500">
@@ -89,11 +114,7 @@ export function ResourceEstimator() {
                                     return (
                                         <button
                                             key={priority.id}
-                                            onClick={() => {
-                                                setSelectedPriority(priority.id);
-                                                // Reset lower steps if changing priority
-                                                setShowFinalStep(false);
-                                            }}
+                                            onClick={() => setSelectedPriority(priority.id)}
                                             className={cn(
                                                 "relative flex flex-col items-start p-6 text-left transition-all duration-300 rounded-xl border group outline-none",
                                                 isSelected
@@ -139,10 +160,10 @@ export function ResourceEstimator() {
                         </div>
 
                         {/* 02. Identity Section */}
-                        <AnimatePresence>
+                        <AnimatePresence mode="wait">
                             {selectedPriority && (
                                 <motion.div
-                                    key="identity-section"
+                                    key={selectedPriority}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
@@ -151,10 +172,9 @@ export function ResourceEstimator() {
                                 >
                                     <div className="flex items-center justify-between">
                                         <label className="text-xs font-semibold text-gray-500 uppercase tracking-[0.2em] block">
-                                            02. Core Identity
+                                            02. Intelligence Context
                                         </label>
 
-                                        {/* Progressive Disclosure Button */}
                                         <AnimatePresence>
                                             {canProceedToFinal && !showFinalStep && (
                                                 <motion.button
@@ -174,16 +194,17 @@ export function ResourceEstimator() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                                         <div className="space-y-4">
                                             <label className="text-xs font-bold text-gray-400 block uppercase tracking-wider">
-                                                Primary Model
+                                                {DYNAMIC_FIELDS[selectedPriority as keyof typeof DYNAMIC_FIELDS].field1.label}
                                             </label>
                                             <div className="relative group">
                                                 <select
-                                                    value={primaryModel}
-                                                    onChange={(e) => setPrimaryModel(e.target.value)}
+                                                    value={field1}
+                                                    onChange={(e) => setField1(e.target.value)}
                                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white appearance-none focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all cursor-pointer group-hover:border-white/20"
                                                 >
-                                                    <option className="bg-neutral-900" value="standard">Auren-1-Standard</option>
-                                                    <option className="bg-neutral-900" value="reasoning">Auren-1-Reasoning</option>
+                                                    {DYNAMIC_FIELDS[selectedPriority as keyof typeof DYNAMIC_FIELDS].field1.options.map(opt => (
+                                                        <option key={opt} className="bg-neutral-900" value={opt}>{opt}</option>
+                                                    ))}
                                                 </select>
                                                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none group-hover:text-gray-300 transition-colors" />
                                             </div>
@@ -191,15 +212,20 @@ export function ResourceEstimator() {
 
                                         <div className="space-y-4">
                                             <label className="text-xs font-bold text-gray-400 block uppercase tracking-wider">
-                                                Project Identifier
+                                                {DYNAMIC_FIELDS[selectedPriority as keyof typeof DYNAMIC_FIELDS].field2.label}
                                             </label>
-                                            <input
-                                                type="text"
-                                                value={projectIdentifier}
-                                                onChange={(e) => setProjectIdentifier(e.target.value)}
-                                                placeholder="e.g. quantum-neural-v2"
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all group-hover:border-white/20"
-                                            />
+                                            <div className="relative group">
+                                                <select
+                                                    value={field2}
+                                                    onChange={(e) => setField2(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white appearance-none focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all cursor-pointer group-hover:border-white/20"
+                                                >
+                                                    {DYNAMIC_FIELDS[selectedPriority as keyof typeof DYNAMIC_FIELDS].field2.options.map(opt => (
+                                                        <option key={opt} className="bg-neutral-900" value={opt}>{opt}</option>
+                                                    ))}
+                                                </select>
+                                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none group-hover:text-gray-300 transition-colors" />
+                                            </div>
                                         </div>
                                     </div>
                                 </motion.div>
