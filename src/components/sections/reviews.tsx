@@ -29,7 +29,7 @@ const testimonials = [
   }
 ];
 
-export default function TestimonialCarousel() {
+export default function Reviews() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
@@ -69,7 +69,7 @@ export default function TestimonialCarousel() {
   };
 
   return (
-    <section id="testimonials" className="py-24 relative overflow-hidden bg-black">
+    <section id="reviews" className="py-24 relative overflow-hidden bg-black">
       {/* Background Orbs */}
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-amber-500/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-amber-600/5 blur-[100px] rounded-full pointer-events-none" />
@@ -96,7 +96,29 @@ export default function TestimonialCarousel() {
             </motion.h2>
           </div>
 
-          <div className="relative h-[400px] md:h-[350px] flex items-center justify-center">
+          <div className="relative h-[450px] md:h-[350px] flex items-center justify-center">
+            {/* Navigation Arrows - Placed for better visibility */}
+            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 flex justify-between px-2 md:-px-16 z-20 pointer-events-none">
+              <motion.button
+                whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.1)" }}
+                whileTap={{ scale: 0.9 }}
+                onClick={prevStep}
+                className="p-4 rounded-full border border-white/20 bg-white/5 text-white pointer-events-auto backdrop-blur-sm transition-all shadow-lg hover:border-amber-500/50"
+                aria-label="Previous testimonial"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.1)" }}
+                whileTap={{ scale: 0.9 }}
+                onClick={nextStep}
+                className="p-4 rounded-full border border-white/20 bg-white/5 text-white pointer-events-auto backdrop-blur-sm transition-all shadow-lg hover:border-amber-500/50"
+                aria-label="Next testimonial"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </motion.button>
+            </div>
+
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
                 key={index}
@@ -109,7 +131,7 @@ export default function TestimonialCarousel() {
                   x: { type: "spring", stiffness: 300, damping: 30 },
                   opacity: { duration: 0.4 },
                 }}
-                className="absolute inset-0 flex flex-col items-center text-center px-4"
+                className="absolute inset-0 flex flex-col items-center text-center px-12 md:px-20"
               >
                 <div className="relative w-20 h-20 mb-8">
                   <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl" />
@@ -126,7 +148,7 @@ export default function TestimonialCarousel() {
                   </div>
                 </div>
 
-                <p className="text-xl md:text-2xl text-zinc-300 italic mb-8 leading-relaxed max-w-3xl">
+                <p className="text-xl md:text-2xl text-zinc-300 italic mb-8 leading-relaxed max-w-2xl">
                   "{testimonials[index].content}"
                 </p>
 
@@ -138,40 +160,25 @@ export default function TestimonialCarousel() {
             </AnimatePresence>
           </div>
 
-          {/* Navigation */}
-          <div className="flex items-center justify-center gap-6 mt-12">
-            <button
-              onClick={prevStep}
-              className="p-4 rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-amber-500/50 transition-all group"
-              aria-label="Previous testimonial"
-            >
-              <ChevronLeft className="w-6 h-6 group-hover:text-amber-500 transition-colors" />
-            </button>
-            <div className="flex gap-2">
-              {testimonials.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    setDirection(i > index ? 1 : -1);
-                    setIndex(i);
-                  }}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    i === index ? 'bg-amber-500 w-6' : 'bg-white/20'
-                  }`}
-                  aria-label={`Go to testimonial ${i + 1}`}
-                />
-              ))}
-            </div>
-            <button
-              onClick={nextStep}
-              className="p-4 rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-amber-500/50 transition-all group"
-              aria-label="Next testimonial"
-            >
-              <ChevronRight className="w-6 h-6 group-hover:text-amber-500 transition-colors" />
-            </button>
+          {/* Dots Indicator */}
+          <div className="flex items-center justify-center gap-2 mt-8">
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setDirection(i > index ? 1 : -1);
+                  setIndex(i);
+                }}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  i === index ? 'bg-amber-500 w-6' : 'bg-white/20'
+                }`}
+                aria-label={`Go to testimonial ${i + 1}`}
+              />
+            ))}
           </div>
         </div>
       </div>
     </section>
   );
 }
+

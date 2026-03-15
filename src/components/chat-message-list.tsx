@@ -8,6 +8,7 @@ import { User, Bot } from "lucide-react";
 interface Message {
     role: "user" | "assistant" | "system";
     content: string;
+    suggestions?: string[];
 }
 
 interface ChatMessageListProps {
@@ -27,7 +28,7 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
     return (
         <div
             ref={scrollRef}
-            className="space-y-6 mb-8 max-h-[500px] overflow-y-auto custom-scrollbar pr-4"
+            className="space-y-6 mb-8 max-h-[600px] overflow-y-auto custom-scrollbar pr-4"
         >
             {messages.map((msg, index) => (
                 <motion.div

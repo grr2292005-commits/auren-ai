@@ -132,8 +132,9 @@ export function ResourceEstimator() {
                                     const isSelected = selectedPriority === priority.id;
 
                                     return (
-                                        <button
+                                        <motion.button
                                             key={priority.id}
+                                            whileTap={{ scale: 0.98 }}
                                             onClick={() => setSelectedPriority(priority.id)}
                                             className={cn(
                                                 "relative flex flex-col items-start p-6 text-left transition-all duration-300 rounded-xl border group outline-none",
@@ -173,7 +174,7 @@ export function ResourceEstimator() {
                                                     className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"
                                                 />
                                             )}
-                                        </button>
+                                        </motion.button>
                                     );
                                 })}
                             </div>
@@ -295,8 +296,9 @@ export function ResourceEstimator() {
                                                 </label>
                                                 <div className="grid grid-cols-2 gap-4 h-full">
                                                     {(["Individual", "Organization"] as const).map((type) => (
-                                                        <button
+                                                        <motion.button
                                                             key={type}
+                                                            whileTap={{ scale: 0.95 }}
                                                             onClick={() => setAccountType(type)}
                                                             className={cn(
                                                                 "py-4 rounded-xl border text-sm font-bold transition-all flex items-center justify-center",
@@ -306,7 +308,7 @@ export function ResourceEstimator() {
                                                             )}
                                                         >
                                                             {type}
-                                                        </button>
+                                                        </motion.button>
                                                     ))}
                                                 </div>
                                             </div>
@@ -331,8 +333,9 @@ export function ResourceEstimator() {
                                                 setter: setHighPriority
                                             }
                                         ].map((item) => (
-                                            <button
+                                            <motion.button
                                                 key={item.id}
+                                                whileTap={{ scale: 0.98 }}
                                                 onClick={() => item.setter(!item.state)}
                                                 className={cn(
                                                     "flex items-start gap-4 p-5 rounded-2xl border transition-all group",
@@ -356,13 +359,14 @@ export function ResourceEstimator() {
                                                         {item.sub}
                                                     </span>
                                                 </div>
-                                            </button>
+                                            </motion.button>
                                         ))}
                                     </div>
 
                                     {/* Estimate CTA */}
                                     <div className="pt-8 text-center">
-                                        <button
+                                        <motion.button
+                                            whileTap={{ scale: 0.95 }}
                                             onClick={handleGenerateEstimate}
                                             disabled={isGenerating}
                                             className={cn(
@@ -383,7 +387,7 @@ export function ResourceEstimator() {
                                                 />
                                             )}
                                             <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
-                                        </button>
+                                        </motion.button>
 
                                         {/* Result Display */}
                                         <AnimatePresence>
@@ -395,12 +399,14 @@ export function ResourceEstimator() {
                                                 >
                                                     <div className="bg-neutral-950 rounded-[22px] p-8 md:p-10 relative overflow-hidden">
                                                         {/* Close button for result */}
-                                                        <button
+                                                        <motion.button
+                                                            whileHover={{ scale: 1.1 }}
+                                                            whileTap={{ scale: 0.9 }}
                                                             onClick={() => setShowResult(false)}
                                                             className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
                                                         >
                                                             <X className="w-5 h-5" />
-                                                        </button>
+                                                        </motion.button>
 
                                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
                                                             <div className="text-left space-y-2">
@@ -423,12 +429,20 @@ export function ResourceEstimator() {
                                                             </div>
 
                                                             <div className="flex flex-col gap-3">
-                                                                <button className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors">
+                                                                <motion.button 
+                                                                    whileHover={{ scale: 1.02 }}
+                                                                    whileTap={{ scale: 0.98 }}
+                                                                    className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                                                                >
                                                                     Start Free Trial
-                                                                </button>
-                                                                <button className="w-full py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-colors">
+                                                                </motion.button>
+                                                                <motion.button 
+                                                                    whileHover={{ scale: 1.02 }}
+                                                                    whileTap={{ scale: 0.98 }}
+                                                                    className="w-full py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-colors"
+                                                                >
                                                                     Contact Sales
-                                                                </button>
+                                                                </motion.button>
                                                             </div>
                                                         </div>
 

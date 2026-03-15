@@ -51,7 +51,9 @@ export function Hero() {
                         <motion.button 
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95, boxShadow: "0 0 25px rgba(245, 158, 11, 0.6)" }}
-                            onClick={() => window.location.href = '#'}
+                            onClick={() => {
+                                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                            }}
                             className="px-8 py-4 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-semibold shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all flex items-center gap-2 group focus:outline-none"
                         >
                             Get Started

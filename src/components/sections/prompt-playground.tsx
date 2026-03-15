@@ -9,6 +9,7 @@ import { Trash2 } from "lucide-react";
 interface Message {
     role: "user" | "assistant" | "system";
     content: string;
+    suggestions?: string[];
 }
 
 export function PromptPlayground() {
@@ -58,7 +59,7 @@ export function PromptPlayground() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/10 blur-[120px] pointer-events-none rounded-full" />
 
             <div className="container mx-auto px-6">
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Experience the interface.</h2>
                         <p className="text-gray-400 text-lg max-w-2xl mx-auto">
@@ -73,7 +74,7 @@ export function PromptPlayground() {
                         transition={{ duration: 0.6 }}
                         className="p-1 rounded-[2.5rem] bg-gradient-to-b from-white/10 to-transparent shadow-2xl"
                     >
-                        <div className="bg-[#121212] p-6 md:p-10 rounded-[2.25rem] border border-white/5 relative flex flex-col min-h-[500px]">
+                        <div className="bg-[#121212] p-6 md:p-10 rounded-[2.25rem] border border-white/5 relative flex flex-col min-h-[650px]">
                             {/* Window Header */}
                             <div className="absolute top-4 left-6 flex gap-1.5 opacity-40">
                                 <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
@@ -82,43 +83,50 @@ export function PromptPlayground() {
                             </div>
 
                             {messages.length > 0 && (
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.05, color: "#f87171" }}
+                                    whileTap={{ scale: 0.95 }}
                                     onClick={clearChat}
                                     className="absolute top-4 right-6 text-gray-500 hover:text-red-400 transition-colors flex items-center gap-1 text-xs uppercase tracking-widest font-bold"
                                 >
                                     <Trash2 className="w-3.5 h-3.5" />
                                     <span>Reset</span>
-                                </button>
+                                </motion.button>
                             )}
 
                             <div className="flex-grow mt-12 mb-6 overflow-hidden flex flex-col">
                                 <ChatMessageList messages={messages} isLoading={isLoading} />
                             </div>
 
-                            <div className="max-w-2xl mx-auto w-full">
+                            <div className="max-w-3xl mx-auto w-full">
+                                {messages.length > 0 && !isLoading && messages[messages.length - 1].role === "assistant" && messages[messages.length - 1].suggestions && messages[messages.length - 1].suggestions!.length > 0 && (
+                                    <div className="mb-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                        <div className="flex items-center gap-2 mb-3 px-1">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500/50 animate-pulse" />
+                                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Suggested</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2 justify-start">
+                                            {messages[messages.length - 1].suggestions!.map((suggestion, idx) => (
+                                                <motion.button
+                                                    key={idx}
+                                                    whileHover={{ scale: 1.02, backgroundColor: "rgba(245, 158, 11, 0.1)", borderColor: "rgba(245, 158, 11, 0.3)" }}
+                                                    whileTap={{ scale: 0.98 }}
+                                                    onClick={() => handleSend(suggestion)}
+                                                    className="text-xs text-amber-500/90 bg-amber-500/5 px-4 py-2 rounded-xl border border-amber-500/10 transition-all text-left max-w-xs"
+                                                >
+                                                    {suggestion}
+                                                </motion.button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
                                 <PromptInputBox
                                     onSend={handleSend}
                                     isLoading={isLoading}
                                     placeholder="Ask Auren anything..."
                                 />
 
-                                {messages.length === 0 && (
-                                    <div className="mt-8 flex flex-wrap justify-center gap-3">
-                                        <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Try:</span>
-                                        <button
-                                            onClick={() => handleSend("Build a React dashboard with Tailwind")}
-                                            className="text-xs text-amber-500/80 hover:text-amber-500 transition-colors bg-amber-500/5 px-3 py-1 rounded-full border border-amber-500/10"
-                                        >
-                                            "Build a React dashboard"
-                                        </button>
-                                        <button
-                                            onClick={() => handleSend("Explain corporate strategy for a tech startup")}
-                                            className="text-xs text-amber-500/80 hover:text-amber-500 transition-colors bg-amber-500/5 px-3 py-1 rounded-full border border-amber-500/10"
-                                        >
-                                            "Explain tech strategy"
-                                        </button>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </motion.div>

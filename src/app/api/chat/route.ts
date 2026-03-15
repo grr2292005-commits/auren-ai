@@ -35,7 +35,16 @@ export async function POST(req: NextRequest) {
       - Friendly but minimal.
       - No robotic pleasantries (e.g., "I hope this finds you well").
       - Use a peer-to-peer consultant tone.
-      - End with a single, short follow-up question.`
+      ### RESPONSE STYLE:
+      - Friendly but minimal.
+      - No robotic pleasantries (e.g., "I hope this finds you well").
+      - Use a peer-to-peer consultant tone.
+      - End with a single, short follow-up question.
+
+      ### SUGGESTIONS REQUIREMENT:
+      At the very end of your response, ALWAYS include exactly 4 predicted follow-up questions that the user might want to ask next.
+      Enclose them strictly in a <suggestions> tag as a JSON array of strings.
+      Example: <suggestions>["How does pricing work?", "Can I see a demo?", "Is there an API?", "What is the token limit?"]</suggestions>`
         };
 
         const response = await fetch(url, {
@@ -61,7 +70,29 @@ export async function POST(req: NextRequest) {
         }
 
         const data = await response.json();
-        return NextResponse.json(data.choices[0].message);
+        const content = data.choices[0].message.content || "";
+        
+        // Extract suggestions if present
+        let cleanContent = content;
+        let suggestions: string[] = [];
+        
+        const suggestionsMatch = content.match(/<suggestions>([\s\S]*?)<\/suggestions>/);
+        if (suggestionsMatch) {
+            try {
+                suggestions = JSON.parse(suggestionsMatch[1]);
+                cleanContent = content.replace(/<suggestions>[\s\S]*?<\/suggestions>/, "").trim();
+            } catch (e) {
+                console.error("Failed to parse suggestions:", e);
+                // Fallback to empty if parse fails
+                cleanContent = content.replace(/<suggestions>[\s\S]*?<\/suggestions>/, "").trim();
+            }
+        }
+
+        return NextResponse.json({
+            role: "assistant",
+            content: cleanContent,
+            suggestions: suggestions.slice(0, 4) // Ensure only 4
+        });
     } catch (error) {
         console.error("Chat API Error:", error);
         return NextResponse.json(
