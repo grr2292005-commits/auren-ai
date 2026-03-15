@@ -15,6 +15,29 @@ interface Message {
 export function PromptPlayground() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [reasoningStep, setReasoningStep] = useState("");
+
+    const reasoningSteps = [
+        "Analyzing project context...",
+        "Optimizing response architecture...",
+        "Synthesizing strategic insights...",
+        "Finalizing high-fidelity output..."
+    ];
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isLoading) {
+            let step = 0;
+            setReasoningStep(reasoningSteps[0]);
+            interval = setInterval(() => {
+                step = (step + 1) % reasoningSteps.length;
+                setReasoningStep(reasoningSteps[step]);
+            }, 1500);
+        } else {
+            setReasoningStep("");
+        }
+        return () => clearInterval(interval);
+    }, [isLoading]);
 
     const handleSend = async (message: string) => {
         if (!message.trim()) return;
@@ -95,10 +118,32 @@ export function PromptPlayground() {
                             )}
 
                             <div className="flex-grow mt-12 mb-6 overflow-hidden flex flex-col">
-                                <ChatMessageList messages={messages} isLoading={isLoading} />
+                                <motion.div 
+                                    animate={messages.length > 4 ? { scale: 0.98, opacity: 0.9, y: -10 } : { scale: 1, opacity: 1, y: 0 }}
+                                    transition={{ type: "spring", damping: 25, stiffness: 120 }}
+                                    className="h-full flex flex-col pt-4"
+                                >
+                                    <ChatMessageList messages={messages} isLoading={isLoading} />
+                                </motion.div>
                             </div>
 
                             <div className="max-w-3xl mx-auto w-full">
+                                {isLoading && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="mb-8 flex items-center gap-3 px-1"
+                                    >
+                                        <div className="flex flex-col gap-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                                <span className="text-[10px] font-bold text-amber-500/80 uppercase tracking-[0.2em]">Reasoning</span>
+                                            </div>
+                                            <span className="text-xs text-gray-500 italic ml-3.5">{reasoningStep}</span>
+                                        </div>
+                                    </motion.div>
+                                )}
+
                                 {messages.length > 0 && !isLoading && messages[messages.length - 1].role === "assistant" && messages[messages.length - 1].suggestions && messages[messages.length - 1].suggestions!.length > 0 && (
                                     <div className="mb-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                         <div className="flex items-center gap-2 mb-3 px-1">
@@ -109,12 +154,30 @@ export function PromptPlayground() {
                                             {messages[messages.length - 1].suggestions!.map((suggestion, idx) => (
                                                 <motion.button
                                                     key={idx}
-                                                    whileHover={{ scale: 1.02, backgroundColor: "rgba(245, 158, 11, 0.1)", borderColor: "rgba(245, 158, 11, 0.3)" }}
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ 
+                                                        delay: idx * 0.1, 
+                                                        type: "spring", 
+                                                        stiffness: 260, 
+                                                        damping: 20 
+                                                    }}
+                                                    whileHover={{ 
+                                                        scale: 1.02, 
+                                                        backgroundColor: "rgba(245, 158, 11, 0.1)", 
+                                                        borderColor: "rgba(245, 158, 11, 0.3)" 
+                                                    }}
                                                     whileTap={{ scale: 0.98 }}
                                                     onClick={() => handleSend(suggestion)}
-                                                    className="text-xs text-amber-500/90 bg-amber-500/5 px-4 py-2 rounded-xl border border-amber-500/10 transition-all text-left max-w-xs"
+                                                    className="text-xs text-amber-500/90 bg-amber-500/5 px-4 py-2 rounded-xl border border-amber-500/10 transition-all text-left max-w-xs relative overflow-hidden group"
                                                 >
-                                                    {suggestion}
+                                                    <span className="relative z-10">{suggestion}</span>
+                                                    <motion.div 
+                                                        className="absolute inset-0 bg-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        initial={false}
+                                                        animate={{ x: ["-100%", "100%"] }}
+                                                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                                    />
                                                 </motion.button>
                                             ))}
                                         </div>

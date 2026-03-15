@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   description: "The premium workspace for thinking, building, and shipping with AI. Designed for modern professional workflows.",
 };
 
+import { AmbientGlow } from "@/components/ui/ambient-glow";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,6 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
+        <AmbientGlow />
         {children}
       </body>
     </html>
