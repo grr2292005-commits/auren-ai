@@ -48,13 +48,23 @@ export function Hero() {
                         transition={{ duration: 0.5, delay: 0.3 }}
                         className="flex flex-col sm:flex-row items-center justify-center gap-4"
                     >
-                        <button className="px-8 py-4 rounded-full bg-white text-black font-semibold hover:bg-gray-200 transition-all flex items-center gap-2 group">
-                            Start Building
+                        <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95, boxShadow: "0 0 25px rgba(245, 158, 11, 0.6)" }}
+                            onClick={() => window.location.href = '#'}
+                            className="px-8 py-4 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-semibold shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all flex items-center gap-2 group focus:outline-none"
+                        >
+                            Get Started
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </button>
-                        <button className="px-8 py-4 rounded-full border border-white/10 bg-white/5 text-white font-semibold hover:bg-white/10 transition-all">
+                        </motion.button>
+                        <motion.button 
+                            whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.1)" }}
+                            whileTap={{ scale: 0.95, boxShadow: "0 0 15px rgba(255, 255, 255, 0.2)" }}
+                            onClick={() => window.location.href = '#'}
+                            className="px-8 py-4 rounded-full border border-white/20 bg-transparent text-white font-semibold hover:border-white/40 transition-all focus:outline-none"
+                        >
                             View Demo
-                        </button>
+                        </motion.button>
                     </motion.div>
                 </div>
             </div>

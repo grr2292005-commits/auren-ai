@@ -24,9 +24,14 @@ export function Navbar() {
                 </div>
 
                 <div className="pl-4 border-l border-white/10">
-                    <button className="text-sm font-semibold text-white px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all">
+                    <motion.button 
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95, boxShadow: "0 0 15px rgba(255, 255, 255, 0.3)" }}
+                        onClick={() => window.location.href = '#'}
+                        className="text-sm font-semibold text-white px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all focus:outline-none"
+                    >
                         Join Waitlist
-                    </button>
+                    </motion.button>
                 </div>
             </motion.div>
         </nav>

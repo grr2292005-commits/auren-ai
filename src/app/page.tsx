@@ -29,6 +29,8 @@ export default function Home() {
 
       <Features />
 
+      <TestimonialCarousel />
+
       {/* Workflow Section */}
       <section className="py-24 overflow-hidden">
         <div className="container mx-auto px-6">
@@ -80,8 +82,6 @@ export default function Home() {
       </section>
 
       <ResourceEstimator />
-
-      <TestimonialCarousel />
 
       <PromptPlayground />
       <CTA />

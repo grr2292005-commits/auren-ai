@@ -19,13 +19,23 @@ export function CTA() {
                         </p>
 
                         <div className="flex flex-wrap gap-4">
-                            <button className="px-10 py-4 rounded-full bg-white text-black font-bold hover:bg-gray-200 transition-all flex items-center gap-2">
+                            <motion.button 
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95, boxShadow: "0 0 20px rgba(255, 255, 255, 0.4)" }}
+                                onClick={() => window.location.href = '#'}
+                                className="px-10 py-4 rounded-full bg-white text-black font-bold hover:bg-gray-200 transition-all flex items-center gap-2"
+                            >
                                 Get Started Free
                                 <ArrowUpRight className="w-5 h-5" />
-                            </button>
-                            <button className="px-10 py-4 rounded-full border border-white/20 text-white font-bold hover:bg-white/5 transition-all">
+                            </motion.button>
+                            <motion.button 
+                                whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.05)" }}
+                                whileTap={{ scale: 0.95, boxShadow: "0 0 15px rgba(255, 255, 255, 0.2)" }}
+                                onClick={() => window.location.href = '#'}
+                                className="px-10 py-4 rounded-full border border-white/20 text-white font-bold transition-all"
+                            >
                                 Contact Sales
-                            </button>
+                            </motion.button>
                         </div>
 
                         <div className="mt-12 flex items-center gap-6 text-gray-500 text-sm">
