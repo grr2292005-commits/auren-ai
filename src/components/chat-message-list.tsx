@@ -28,7 +28,7 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
     return (
         <div
             ref={scrollRef}
-            className="space-y-6 mb-8 max-h-[600px] overflow-y-auto custom-scrollbar pr-4"
+            className="space-y-6 mb-8 max-h-[600px] flex-grow overflow-y-auto custom-scrollbar pr-4 flex flex-col"
         >
             {messages.map((msg, index) => (
                 <motion.div
@@ -82,8 +82,14 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
             )}
 
             {messages.length === 0 && !isLoading && (
-                <div className="text-center py-12">
-                    <p className="text-gray-500 italic">No messages yet. Try asking Auren something!</p>
+                <div className="flex-grow flex flex-col items-center justify-center py-12 text-center animate-in fade-in zoom-in-95 duration-700">
+                    <div className="w-16 h-16 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+                        <Bot className="w-8 h-8 text-amber-500/50" />
+                    </div>
+                    <h3 className="text-white font-semibold text-lg mb-2">Ready to assist.</h3>
+                    <p className="text-gray-500 max-w-[280px] leading-relaxed">
+                        Auren is active and waiting for your first command. Type below to begin.
+                    </p>
                 </div>
             )}
         </div>
