@@ -5,10 +5,14 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { User, Bot } from "lucide-react";
 
-interface Message {
+import { ResponseRenderer } from "./chat/response-renderer";
+
+export interface Message {
     role: "user" | "assistant" | "system";
     content: string;
     suggestions?: string[];
+    type?: "carousel" | "grid" | "steps" | "text";
+    data?: any;
 }
 
 interface ChatMessageListProps {
@@ -59,7 +63,11 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
                                 : "bg-amber-500/5 border border-amber-500/10 text-white"
                         )}
                     >
-                        {msg.content}
+                        <ResponseRenderer 
+                            type={msg.type} 
+                            data={msg.data} 
+                            content={msg.content} 
+                        />
                     </div>
                 </motion.div>
             ))}

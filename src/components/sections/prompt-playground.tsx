@@ -3,14 +3,8 @@
 import { motion } from "framer-motion";
 import { PromptInputBox } from "@/components/ui/ai-prompt-box";
 import { useState, useRef, useEffect } from "react";
-import { ChatMessageList } from "@/components/chat-message-list";
 import { Trash2 } from "lucide-react";
-
-interface Message {
-    role: "user" | "assistant" | "system";
-    content: string;
-    suggestions?: string[];
-}
+import { ChatMessageList, type Message } from "@/components/chat-message-list";
 
 export function PromptPlayground() {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -60,12 +54,13 @@ export function PromptPlayground() {
             }
 
             const aiMessage: Message = await response.json();
+            console.log("AI Response Received:", aiMessage); // Debug logging
             setMessages((prev) => [...prev, aiMessage]);
         } catch (error) {
             console.error("Chat error:", error);
             setMessages((prev) => [
                 ...prev,
-                { role: "assistant", content: "I'm sorry, I encountered an error connecting to my core reasoning engine. Please check your configuration." }
+                { role: "assistant", content: "I'm sorry, I encountered an error. Please try again." }
             ]);
         } finally {
             setIsLoading(false);

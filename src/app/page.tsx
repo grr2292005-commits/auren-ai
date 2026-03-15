@@ -4,6 +4,8 @@ import { Features } from "@/components/sections/features";
 import { ResourceEstimator } from "@/components/sections/resource-estimator";
 import Reviews from "@/components/sections/reviews";
 import { PromptPlayground } from "@/components/sections/prompt-playground";
+import { Pricing } from "@/components/sections/pricing";
+import { Team } from "@/components/sections/team";
 import { CTA } from "@/components/sections/cta";
 import { Footer } from "@/components/sections/footer";
 
@@ -82,8 +84,10 @@ export default function Home() {
       </section>
 
       <ResourceEstimator />
+      <Team />
 
       <PromptPlayground />
+      <Pricing />
       <CTA />
       <Footer />
     </main>
